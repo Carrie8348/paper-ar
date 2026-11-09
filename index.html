@@ -13,10 +13,17 @@
       text-align: center; color: #fff; font: 15px/1.4 -apple-system, sans-serif;
       text-shadow: 0 1px 3px rgba(0,0,0,.6); pointer-events: none;
     }
+    #sound {
+      position: fixed; top: 20px; right: 20px; z-index: 20; display: none;
+      padding: 10px 16px; border: 0; border-radius: 999px;
+      background: rgba(255,255,255,.9); color: #000;
+      font: 600 15px -apple-system, sans-serif;
+    }
   </style>
 </head>
 <body>
   <div id="hint">把手机对准纸上的图片</div>
+  <button id="sound">🔊 开启声音</button>
   <a-scene
     mindar-image="imageTargetSrc: ./targets.mind; maxTrack: 1"
     color-space="sRGB"
@@ -36,8 +43,11 @@
     const target = document.querySelector('#target');
     const hint = document.querySelector('#hint');
     const vid = document.querySelector('#vid');
+    const soundBtn = document.querySelector('#sound');
+
     target.addEventListener('targetFound', () => {
       hint.style.display = 'none';
+      if (vid.muted) soundBtn.style.display = 'block';
       vid.play().catch(() => {
         hint.textContent = '点一下屏幕播放';
         hint.style.display = 'block';
@@ -45,9 +55,18 @@
     });
     target.addEventListener('targetLost', () => {
       vid.pause();
+      soundBtn.style.display = 'none';
       hint.textContent = '把手机对准纸上的图片';
       hint.style.display = 'block';
     });
+
+    soundBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      vid.muted = false;
+      vid.play();
+      soundBtn.style.display = 'none';
+    });
+
     document.body.addEventListener('click', () => {
       vid.play().then(() => { hint.style.display = 'none'; }).catch(() => {});
     });
